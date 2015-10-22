@@ -154,13 +154,17 @@ Note that, on Windows, as stated in the [Node.js documentation](https://nodejs.o
 
 * `command` Path to the executable file to start.
 
-* `commandArgs` Array of string arguments to pass to the executable.
+* `commandArgs` Array of string arguments to pass to the executable. Defaults to an empty array. The URL the browser should connect to is appended as the last parameter.
 
 ### $phantomjs
 
 The `$phantomjs` launcher allows to easily start [PhantomJS](http://phantomjs.org/), with a control script adapted to *attester*. It internally relies on the `$process` launcher to start *PhantomJS*.
 
 * `phantomjsPath` Path to the phantomjs executable. Defaults to the value of the `PHANTOMJS_PATH` environment variable if it is available, or the `"phantomjs"` string otherwise (which means phantomjs should be in the path).
+
+* `phantomjsArgs` Array of string arguments to pass to the phantomjs executable. Defaults to an empty array.
+
+* `scriptArgs` Arguments to the phantomjs control script. Defaults to an empty array.
 
 ### $webdriver
 
