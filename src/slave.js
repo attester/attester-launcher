@@ -172,7 +172,9 @@ Slave.prototype.stop = function() {
 Slave.prototype.notifyConnectionFailure = function() {
     var slaveFactory = this.slaveFactory;
     slaveFactory.remainingConnectionRetries--;
-    if (slaveFactory.remainingConnectionRetries > 0) {
+    if (slaveFactory.fatalError) {
+        // nothing to display, the slave factory is already disabled
+    } else if (slaveFactory.remainingConnectionRetries > 0) {
         this.emit("log", ["error", "Creating an instance of %s with %s failed %d time(s) (remaining count: %d)", slaveFactory.browserName, slaveFactory.name, slaveFactory.connectionRetries - slaveFactory.remainingConnectionRetries, slaveFactory.remainingConnectionRetries]);
     } else if (slaveFactory.remainingConnectionRetries === 0) {
         this.emit("log", ["error", "Creating instances of %s with %s failed %d time(s), giving up!", slaveFactory.browserName, slaveFactory.name, slaveFactory.connectionRetries]);
