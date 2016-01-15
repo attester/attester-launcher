@@ -80,7 +80,8 @@ var builtinLaunchers = SlaveFactory.builtinLaunchers = {
     "$phantomjs": require("./launchers/phantomjs"),
     "$webdriver": require("./launchers/webdriver"),
     "$saucelabs": require("./launchers/saucelabs"),
-    "$virtualbox": require("./launchers/virtualbox")
+    "$virtualbox": require("./launchers/virtualbox"),
+    "$vboxrobot": require("./launchers/vboxrobot")
 };
 
 // processes the configuration of launchers

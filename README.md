@@ -210,6 +210,30 @@ This launcher requires Virtual Box 5.0 or later.
 
 * `password` Password to use inside the virtual machine.
 
+### $vboxrobot
+
+The `$vboxrobot` launcher allows to use a web browser from a virtual machine managed by the [vbox-robot server](https://github.com/attester/vbox-robot). The configured virtual machine is cloned from the specified snapshot. The clone is then started and executes the specified command. When tests are finished, the virtual machine is powered off and deleted.
+
+* `server` Address of the [vbox-robot server](https://github.com/attester/vbox-robot). It should include authentication information if this is required to connect to the server.
+
+* `vm` Name of the virtual machine to use. The virtual machine will be cloned before being started, so that it is possible to start multiple instances of the same virtual machine.
+
+* `snapshot` Name of the snapshot to use when cloning the virtual machine.
+
+* `command` Command to use inside the virtual machine to start the browser. This can be either a simple string, or an array in order to include command line arguments (which are then positioned before `commandArgs`).
+
+* `commandArgs` Arguments to add to `command`. The URL the browser should connect to is appended as the last argument.
+
+* `launcherOnly` If set to true, `command` is supposed to be only a launcher, which means that, when it exits, it does not mean the browser exited, so this does not cause the virtual machine to be stopped. Defaults to false (so the machine is stopped after `command` stops running).
+
+* `pingCommand` If specified, this command will be executed repetitively until its return code is 0, before `command` is started. This is useful especially to wait for the network to be connected in the virtual machine before starting the web browser. This can be either a simple string (if no argument needs to be passed) or an array (with command line arguments). The host name of the attester server is appended as the last argument.
+
+* `pingInterval` Interval (in milliseconds) between a unsuccessful ping command (returning a non-zero exit code) and the next execution of the ping command. Defaults to 1000 (which is one second).
+
+* `username` Name of user to use inside the virtual machine to start `command` and `pingCommand`.
+
+* `password` Password to use inside the virtual machine.
+
 ## License
 
 [Apache License 2.0](https://github.com/attester/attester-launcher/blob/master/LICENSE)
