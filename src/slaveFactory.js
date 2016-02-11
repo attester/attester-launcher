@@ -47,6 +47,7 @@ var SlaveFactory = module.exports = function(browserName, param) {
         }));
     }
     this.tags = removeDuplicates(tags);
+    this.urlExtraParameters = generalConfig.urlExtraParameters;
 
     var timeouts = this.timeouts = {};
     Object.keys(defaultTimeouts).forEach(function(name) {

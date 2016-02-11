@@ -122,6 +122,10 @@ Slave.prototype.onStateConnecting = function() {
         return;
     }
     var url = this.server.replace(/\/$/, "") + "/__attester__/slave.html?id=" + encodeURIComponent(this.id);
+    var urlExtraParameters = this.slaveFactory.urlExtraParameters;
+    if (urlExtraParameters) {
+        url += "&" + urlExtraParameters;
+    }
     this.emit("log", ["info", "Starting an instance of %s with %s", this.slaveFactory.browserName, this.slaveFactory.name]);
     try {
         this.launcher = new this.slaveFactory.launcherConstructor();

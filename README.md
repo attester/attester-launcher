@@ -145,6 +145,8 @@ Launchers can be configured through different properties. Properties prefixed wi
 
 * `$exitingTimeout` Specifies the maximum number of milliseconds to wait between the time a browser is asked to close and the time it is reported by the launcher as closed. Defaults to 10000 ms (10s). When this timeout is reached, the browser is considered as closed even if the launcher did not report it, and the instances counters are updated so that it is possible to start another browser if needed.
 
+* `$urlExtraParameters` Specifies extra parameters to set in the URL opened in the browser. Especially, attester allows to add scripts in the page with the `plugin` parameter, so, for example, `plugin=http://127.0.0.1:7778/robot` can be used to include the [robot-server](https://github.com/attester/robot-server).
+
 ### $process
 
 The `$process` launcher allows to start a browser by executing a process specified in the `command` property.
