@@ -15,15 +15,35 @@
  */
 
 var cli = require("../src/cli");
-
 var controller = cli(process.argv.slice(2));
-if (controller && process.send) {
-    process.on("message", function (message) {
-        if (message == "stop") {
-            controller.stop();
-        }
+if (controller) {
+    if (process.send) {
+        process.on("message", function (message) {
+            if (message == "stop") {
+                controller.stop();
+            }
+        });
+        controller.on("exit", function () {
+            process.disconnect();
+        });
+    }
+    process.on("SIGINT", function() {
+        controller.stop();
     });
-    controller.on("exit", function () {
-        process.disconnect();
-    });
+
+    if (process.platform === "win32") {
+        var readline = require("readline").createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        readline.on("SIGINT", function () {
+            process.emit("SIGINT");
+        });
+        controller.on("exit", function () {
+            if (readline) {
+                readline.close();
+                readline = null;
+            }
+        });
+    }
 }
