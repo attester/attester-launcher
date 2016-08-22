@@ -236,6 +236,8 @@ The `$vboxrobot` launcher allows to use a web browser from a virtual machine man
 
 * `password` Password to use inside the virtual machine.
 
+* `closeOnFailedCalibration` If set to true (which is the default), the virtual machine will be closed (powered off and deleted) when the calibration fails. This parameter can be set to false to let the virtual machine continue running when the calibration fails. Note that this parameter requires vbox-robot version 0.0.4 and later (it is ignored with earlier versions).
+
 ## License
 
 [Apache License 2.0](https://github.com/attester/attester-launcher/blob/master/LICENSE)

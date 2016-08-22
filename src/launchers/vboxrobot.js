@@ -86,7 +86,8 @@ VBoxRobotLauncher.prototype.start = function(param) {
             json: true,
             body: {
                 clone: config.vm,
-                snapshot: config.snapshot
+                snapshot: config.snapshot,
+                closeOnFailedCalibration: config.closeOnFailedCalibration != null ? config.closeOnFailedCalibration : true
             }
         })
         .then(function(response) {
