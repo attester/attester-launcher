@@ -62,7 +62,7 @@ module.exports = function(grunt) {
                     if (grep) {
                         args.push("--grep", grep);
                     }
-                    return args.join(' ');
+                    return '"' + args.join('" "') + '"';
                 }
             }
         }
