@@ -17,6 +17,7 @@ var util = require("util");
 
 var WebdriverLauncher = require("./webdriver");
 var copyMap = require("../util/copyMap");
+var mapToJson = require("../util/mapToJson");
 
 var SauceLabsLauncher = module.exports = function() {};
 
@@ -59,5 +60,5 @@ SauceLabsLauncher.prototype.start = function(param) {
 SauceLabsLauncher.prototype.onReceivedSession = function(session) {
     // overrides the parent method to display the url which allows to follow the current job:
     this.emit("log", ["info", "Started session http://saucelabs.com/jobs/%s", session.getId()]);
-    this.emit("log", ["debug", "Capabilities: %j", session.getCapabilities().serialize()]);
+    this.emit("log", ["debug", "Capabilities: %j", mapToJson(session.getCapabilities())]);
 };

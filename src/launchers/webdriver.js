@@ -17,6 +17,7 @@ var webdriver = require('selenium-webdriver');
 var Q = require("q");
 var util = require("util");
 var events = require("events");
+var mapToJson = require("../util/mapToJson");
 
 var WebdriverLauncher = module.exports = function() {};
 
@@ -71,7 +72,7 @@ WebdriverLauncher.prototype.start = function(param) {
 
 WebdriverLauncher.prototype.onReceivedSession = function(session) {
     this.emit("log", ["info", "Started session %s", session.getId()]);
-    this.emit("log", ["debug", "Capabilities: %j", session.getCapabilities().serialize()]);
+    this.emit("log", ["debug", "Capabilities: %j", mapToJson(session.getCapabilities())]);
 };
 
 WebdriverLauncher.prototype.beginConnection = function() {
