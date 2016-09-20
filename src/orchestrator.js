@@ -315,14 +315,14 @@ Orchestrator.prototype.onSlaveLog = function(slave, logArgs) {
     this.emit("log", logArgs);
 };
 
-var createSocketSlaveHandler = function(methodName) {
+var createSocketSlaveHandler = function(methodName, ignoreMissingSlave) {
     return function(arg) {
         var slaveId = arg.id || arg;
         this.emit("log", ["debug", "%s", methodName, slaveId]);
         var slave = this.slavesById[slaveId];
         if (slave) {
             slave[methodName](arg);
-        } else {
+        } else if (!ignoreMissingSlave) {
             // should never happen
             this.emit("log", ["error", "%s %s: ASSERT FAILED, slave not found!", methodName, slaveId]);
         }
@@ -332,7 +332,7 @@ var createSocketSlaveHandler = function(methodName) {
 Orchestrator.prototype.onSocketSlaveConnected = createSocketSlaveHandler("onSlaveConnected");
 Orchestrator.prototype.onSocketSlaveBusy = createSocketSlaveHandler("onSlaveBusy");
 Orchestrator.prototype.onSocketSlaveIdle = createSocketSlaveHandler("onSlaveIdle");
-Orchestrator.prototype.onSocketSlaveDisconnected = createSocketSlaveHandler("onSlaveDisconnected");
+Orchestrator.prototype.onSocketSlaveDisconnected = createSocketSlaveHandler("onSlaveDisconnected", true);
 
 Orchestrator.prototype.onSocketDisconnect = function() {
     this.setState("Disconnected");
