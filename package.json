@@ -27,7 +27,7 @@
         "js-yaml": "3.6.1",
         "minimist": "1.2.0",
         "q": "1.4.1",
-        "selenium-webdriver": "3.0.0-beta-2",
+        "selenium-webdriver": "3.0.0-beta-3",
         "socket.io-client": "1.4.8"
     },
     "devDependencies": {
@@ -35,9 +35,9 @@
         "grunt": "1.0.1",
         "grunt-cli": "1.2.0",
         "grunt-contrib-jshint": "1.0.0",
-        "grunt-exec": "1.0.0",
+        "grunt-exec": "1.0.1",
         "grunt-jsbeautifier": "0.2.13",
-        "mocha": "3.0.2",
-        "sinon": "1.17.5"
+        "mocha": "3.1.0",
+        "sinon": "1.17.6"
     }
 }
