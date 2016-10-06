@@ -167,6 +167,7 @@ The `$phantomjs` launcher allows to easily start [PhantomJS](http://phantomjs.or
 * `phantomjsArgs` Array of string arguments to pass to the phantomjs executable. Defaults to an empty array.
 
 * `scriptArgs` Arguments to the phantomjs control script. Defaults to an empty array.
+    * The `--local-console` argument can be used to display logs (calls to `console.log`, `console.error`...) locally before sending them to the attester server. If this argument is not used, those logs are only sent to the attester server.
 
 ### $webdriver
 
