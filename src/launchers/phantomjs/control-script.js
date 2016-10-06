@@ -22,12 +22,15 @@ var url;
 var autoexitPolling = 8000;
 // Wait for `DOMContentLoaded` for x milliseconds, then for `load` the same amount
 var pageOpenTimeoutMs;
+var localConsole = false;
 
 var parseCommandLine = function() {
     var args = system.args;
     for (var i = 0, l = args.length; i < l; i++) {
         if (args[i].indexOf("--auto-exit-polling") === 0) {
             autoexitPolling = parseInt(args[i].split("=")[1], 10) || autoexitPolling;
+        } else if (args[i] === "--local-console") {
+            localConsole = true;
         } else {
             url = args[i];
         }
@@ -47,7 +50,7 @@ page.viewportSize = {
 };
 
 page.onInitialized = function() {
-    page.evaluate(function() {
+    page.evaluate(function(localConsole) {
         window.attesterConfig = {
             onDisconnect: function() {
                 window.callPhantom({
@@ -58,7 +61,8 @@ page.onInitialized = function() {
                 window.callPhantom({
                     name: 'slaveDispose'
                 });
-            }
+            },
+            localConsole: localConsole
         };
         window.phantomJSRobot = {
             sendEvent: function() {
@@ -79,7 +83,7 @@ page.onInitialized = function() {
                 name: "DOMContentLoaded"
             });
         }, false);
-    });
+    }, localConsole);
 
     page.evaluate("function(){window.phantomJSRobot.keys=(" + JSON.stringify(page.event.key) + ");}");
 };
