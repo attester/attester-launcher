@@ -23,12 +23,13 @@ if (controller) {
                 controller.stop();
             }
         });
-        controller.on("exit", function () {
-            process.disconnect();
-        });
     }
+
     process.on("SIGINT", function() {
         controller.stop();
+    });
+    controller.on("exit", function () {
+        process.exit();
     });
 
     if (process.platform === "win32") {
@@ -38,12 +39,6 @@ if (controller) {
         });
         readline.on("SIGINT", function () {
             process.emit("SIGINT");
-        });
-        controller.on("exit", function () {
-            if (readline) {
-                readline.close();
-                readline = null;
-            }
         });
     }
 }
