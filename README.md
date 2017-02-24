@@ -233,7 +233,9 @@ The `$vboxrobot` launcher allows to use a web browser from a virtual machine man
 
 * `pingInterval` Interval (in milliseconds) between a unsuccessful ping command (returning a non-zero exit code) and the next execution of the ping command. Defaults to 1000 (which is one second).
 
-* `username` Name of user to use inside the virtual machine to start `command` and `pingCommand`.
+* `initCommands` Array of commands to execute just before `command` and just after `pingCommand`. These commands can be used to configure the virtual machine before starting the browser. Each command is expected to be an object with a `command` property containing an array of string arguments (which can contain variables as described in the corresponding section).
+
+* `username` Name of user to use inside the virtual machine to start `pingCommand`, `initCommands` and `command`.
 
 * `password` Password to use inside the virtual machine.
 

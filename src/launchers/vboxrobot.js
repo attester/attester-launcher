@@ -82,6 +82,14 @@ VBoxRobotLauncher.prototype.start = function(param) {
         }
     };
 
+    var initCommands = config.initCommands ? [].concat(config.initCommands) : [];
+    var runInitCommands = function() {
+        if (!self.stopped && initCommands.length > 0) {
+            var entry = initCommands.shift();
+            return run(entry.command).then(runInitCommands);
+        }
+    };
+
     request({
             url: config.server,
             method: "POST",
@@ -97,6 +105,7 @@ VBoxRobotLauncher.prototype.start = function(param) {
             variables.values["ATTESTER-URL"] += "&plugin=" + encodeURIComponent(actionUrls.robotjs);
             return waitForConnectivity();
         })
+        .then(runInitCommands)
         .then(function() {
             if (!self.stopped) {
                 run(buildCommandLine(config.command, config.commandArgs, "${ATTESTER-URL}"))
