@@ -25,9 +25,10 @@ util.inherits(PhantomJSLauncher, ProcessLauncher);
 
 PhantomJSLauncher.prototype.start = function(param) {
     var config = param.config;
+    var variables = param.variables;
     var commandArgs = (config.phantomjsArgs || []).concat([controlScript], config.scriptArgs || []);
     ProcessLauncher.prototype.start.call(this, {
-        url: param.url,
+        variables: variables,
         config: {
             command: config.phantomjsPath || process.env.PHANTOMJS_PATH || "phantomjs",
             commandArgs: commandArgs

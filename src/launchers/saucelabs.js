@@ -48,7 +48,7 @@ SauceLabsLauncher.prototype.start = function(param) {
     capabilities.accessKey = accessKey;
 
     WebdriverLauncher.prototype.start.call(this, {
-        url: param.url,
+        variables: param.variables,
         config: {
             server: config.server || process.env.SAUCE_SELENIUM_SERVER || "http://ondemand.saucelabs.com/wd/hub",
             capabilities: capabilities,

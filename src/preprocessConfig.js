@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+var recurse = require("./util/recurse");
+
 // Match '<%= FOO %>' where FOO is a propString, eg. foo or foo.bar but not
 // a method call like foo() or foo.bar().
 var propStringTmplRe = /<%=\s*([a-z0-9_$]+(?:\.[a-z0-9_$]+)*)\s*%>/gi;
@@ -35,28 +37,6 @@ function replace(value, configData) {
                 return match;
             }
         });
-    }
-}
-
-/**
- * Recurse through objects and arrays executing a function for each non object.
- * The return value replaces the original value
- * @param {Object} value Object on which to recur
- * @param {Function} fn Callback function
- */
-function recurse(value, fn) {
-    if (Object.prototype.toString.call(value) === "[object Array]") {
-        return value.map(function(value) {
-            return recurse(value, fn);
-        });
-    } else if (Object.prototype.toString.call(value) === "[object Object]") {
-        var obj = {};
-        Object.keys(value).forEach(function(key) {
-            obj[key] = recurse(value[key], fn);
-        });
-        return obj;
-    } else {
-        return fn(value);
     }
 }
 

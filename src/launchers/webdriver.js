@@ -26,6 +26,7 @@ util.inherits(WebdriverLauncher, events.EventEmitter);
 WebdriverLauncher.prototype.start = function(param) {
     var self = this;
     var config = param.config;
+    var variables = param.variables;
 
     var configError = "";
     if (!config.capabilities || !config.capabilities.browserName) {
@@ -44,9 +45,9 @@ WebdriverLauncher.prototype.start = function(param) {
     if (config.server) {
         builder.usingServer(config.server);
     }
-    builder.withCapabilities(config.capabilities);
+    builder.withCapabilities(variables.recursivelyReplace(config.capabilities));
 
-    self.url = param.url;
+    self.url = variables.replace("${ATTESTER-URL}");
     self.keepAliveDelay = config.keepAliveDelay;
     self.driver = builder.build();
 

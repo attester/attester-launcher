@@ -19,6 +19,7 @@ var events = require("events");
 var spawn = require('child_process').spawn;
 var streamToLog = require("../util/streamToLog");
 var processToPromise = require("../util/processToPromise");
+var buildCommandLine = require("../util/buildCommandLine");
 
 var Process = module.exports = function() {};
 
@@ -27,12 +28,11 @@ util.inherits(Process, events.EventEmitter);
 Process.prototype.start = function(param) {
     var self = this;
     var config = param.config;
-    var command = config.command;
-    var commandArgs = (config.commandArgs || []).concat([param.url]);
-    self.emit("log", ["debug", "Executing: %s %s", command, commandArgs.join(" ")]);
-    self.processName = path.basename(command, path.extname(command));
+    var commandLine = buildCommandLine(config.command, config.commandArgs, "${ATTESTER-URL}", param.variables);
+    self.emit("log", ["debug", "Executing: %s", commandLine.join(" ")]);
+    self.processName = path.basename(commandLine[0], path.extname(commandLine[0]));
     self.processKilled = false;
-    var curProcess = self.process = spawn(command, commandArgs, {
+    var curProcess = self.process = spawn(commandLine[0], commandLine.slice(1), {
         stdio: "pipe"
     });
     var onProcessLog = self.onProcessLog.bind(self);

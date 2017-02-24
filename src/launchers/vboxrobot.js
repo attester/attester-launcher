@@ -14,10 +14,10 @@
  */
 
 var util = require("util");
-var url = require("url");
 var events = require("events");
 var Q = require("q");
 var request = require("../util/request");
+var buildCommandLine = require("../util/buildCommandLine");
 
 var VBoxRobotLauncher = module.exports = function() {};
 
@@ -32,6 +32,7 @@ var wait = function(delay) {
 VBoxRobotLauncher.prototype.start = function(param) {
     var self = this;
     var config = param.config;
+    var variables = param.variables;
     var configError = "";
     if (!config.server || !config.vm || !config.snapshot || !config.username || !config.command) {
         configError += "At least one of the following mandatory properties is missing: server, vm, snapshot, username, command.";
@@ -54,6 +55,7 @@ VBoxRobotLauncher.prototype.start = function(param) {
     var actionUrls = null;
 
     var run = function(commandLine) {
+        commandLine = commandLine.map(variables.replace);
         return request({
             url: actionUrls.run,
             method: "POST",
@@ -69,7 +71,7 @@ VBoxRobotLauncher.prototype.start = function(param) {
         });
     };
 
-    var pingCommandLine = config.pingCommand ? [].concat(config.pingCommand, url.parse(param.url).hostname) : null;
+    var pingCommandLine = config.pingCommand ? buildCommandLine(config.pingCommand, [], "${ATTESTER-HOSTNAME}") : null;
     var waitForConnectivity = function() {
         if (!self.stopped && pingCommandLine) {
             return run(pingCommandLine).then(function(response) {
@@ -92,12 +94,12 @@ VBoxRobotLauncher.prototype.start = function(param) {
         })
         .then(function(response) {
             actionUrls = response;
+            variables.values["ATTESTER-URL"] += "&plugin=" + encodeURIComponent(actionUrls.robotjs);
             return waitForConnectivity();
         })
         .then(function() {
             if (!self.stopped) {
-                var attesterURL = param.url + "&plugin=" + encodeURIComponent(actionUrls.robotjs);
-                run([].concat(config.command, config.commandArgs || [], attesterURL))
+                run(buildCommandLine(config.command, config.commandArgs, "${ATTESTER-URL}"))
                     .catch(errorHandler)
                     .then(function() {
                         if (!config.launcherOnly) {

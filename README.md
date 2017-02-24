@@ -150,21 +150,21 @@ Launchers can be configured through different properties. Properties prefixed wi
 ### $process
 
 The `$process` launcher allows to start a browser by executing a process specified in the `command` property.
-The URL the browser should connect to is appended at the end of the arguments specified in `commandArgs`.
+The URL the browser should connect to is appended at the end of the arguments specified in `commandArgs` if it is not specified anywhere else in the command line (through `${ATTESTER-URL}`).
 The process is killed when the browser should stop.
 Note that, on Windows, as stated in the [Node.js documentation](https://nodejs.org/api/process.html#process_signal_events), killing the process means terminating it without notification.
 
-* `command` Path to the executable file to start.
+* `command` Path to the executable file to start. This parameter can contain variables (cf the corresponding section below).
 
-* `commandArgs` Array of string arguments to pass to the executable. Defaults to an empty array. The URL the browser should connect to is appended as the last parameter.
+* `commandArgs` Array of string arguments to pass to the executable. Defaults to an empty array. The URL the browser should connect to is appended as the last parameter if it is not specified anywhere else in the command line (through `${ATTESTER-URL}`).  This parameter can contain variables (cf the corresponding section below).
 
 ### $phantomjs
 
 The `$phantomjs` launcher allows to easily start [PhantomJS](http://phantomjs.org/), with a control script adapted to *attester*. It internally relies on the `$process` launcher to start *PhantomJS*.
 
-* `phantomjsPath` Path to the phantomjs executable. Defaults to the value of the `PHANTOMJS_PATH` environment variable if it is available, or the `"phantomjs"` string otherwise (which means phantomjs should be in the path).
+* `phantomjsPath` Path to the phantomjs executable. Defaults to the value of the `PHANTOMJS_PATH` environment variable if it is available, or the `"phantomjs"` string otherwise (which means phantomjs should be in the path). This parameter can contain variables (cf the corresponding section below).
 
-* `phantomjsArgs` Array of string arguments to pass to the phantomjs executable. Defaults to an empty array.
+* `phantomjsArgs` Array of string arguments to pass to the phantomjs executable. Defaults to an empty array. This parameter can contain variables (cf the corresponding section below).
 
 * `scriptArgs` Arguments to the phantomjs control script. Defaults to an empty array.
     * The `--local-console` argument can be used to display logs (calls to `console.log`, `console.error`...) locally before sending them to the attester server. If this argument is not used, those logs are only sent to the attester server.
@@ -175,7 +175,7 @@ The `$webdriver` launcher allows to start a browser with [Selenium WebDriver](ht
 
 * `server` Selenium server to connect to. By default, no server is used, and local browsers are used.
 
-* `capabilities` Map of desired capabilities. You can refer to [the documentation](https://code.google.com/p/selenium/wiki/DesiredCapabilities)
+* `capabilities` Map of desired capabilities. You can refer to [the documentation](https://code.google.com/p/selenium/wiki/DesiredCapabilities). This parameter can contain variables (cf the corresponding section below).
 
 * `keepAliveDelay` Interval (in milliseconds) at which a keep-alive command is sent. Defaults to -1, which disables the keep-alive feature. The command used to keep the browser alive is `getCurrentUrl`.
 
@@ -205,9 +205,9 @@ This launcher requires Virtual Box 5.0 or later.
 
 * `snapshot` Name of the snapshot to use when cloning the virtual machine.
 
-* `command` Command to use inside the virtual machine to start the browser.
+* `command` Command to use inside the virtual machine to start the browser. This parameter can contain variables (cf the corresponding section below).
 
-* `commandArgs` Arguments to pass to the command. The URL the browser should connect to is appended as the last parameter.
+* `commandArgs` Arguments to pass to the command. The URL the browser should connect to is appended as the last parameter if it is not specified anywhere else in the command line (through `${ATTESTER-URL}`). This parameter can contain variables (cf the corresponding section below).
 
 * `username` Name of user to use inside the virtual machine to start the command.
 
@@ -223,13 +223,13 @@ The `$vboxrobot` launcher allows to use a web browser from a virtual machine man
 
 * `snapshot` Name of the snapshot to use when cloning the virtual machine.
 
-* `command` Command to use inside the virtual machine to start the browser. This can be either a simple string, or an array in order to include command line arguments (which are then positioned before `commandArgs`).
+* `command` Command to use inside the virtual machine to start the browser. This can be either a simple string, or an array in order to include command line arguments (which are then positioned before `commandArgs`). This parameter can contain variables (cf the corresponding section below).
 
-* `commandArgs` Arguments to add to `command`. The URL the browser should connect to is appended as the last argument.
+* `commandArgs` Arguments to add to `command`. The URL the browser should connect to is appended as the last argument if it is not specified anywhere else in the command line (through `${ATTESTER-URL}`). This parameter can contain variables (cf the corresponding section below).
 
 * `launcherOnly` If set to true, `command` is supposed to be only a launcher, which means that, when it exits, it does not mean the browser exited, so this does not cause the virtual machine to be stopped. Defaults to false (so the machine is stopped after `command` stops running).
 
-* `pingCommand` If specified, this command will be executed repetitively until its return code is 0, before `command` is started. This is useful especially to wait for the network to be connected in the virtual machine before starting the web browser. This can be either a simple string (if no argument needs to be passed) or an array (with command line arguments). The host name of the attester server is appended as the last argument.
+* `pingCommand` If specified, this command will be executed repetitively until its return code is 0, before `command` is started. This is useful especially to wait for the network to be connected in the virtual machine before starting the web browser. This can be either a simple string (if no argument needs to be passed) or an array (with command line arguments). The host name of the attester server is appended as the last argument if it is not used anywhere else in the command line (through `${ATTESTER-HOSTNAME}`). This parameter can contain variables (cf the corresponding section below).
 
 * `pingInterval` Interval (in milliseconds) between a unsuccessful ping command (returning a non-zero exit code) and the next execution of the ping command. Defaults to 1000 (which is one second).
 
@@ -238,6 +238,17 @@ The `$vboxrobot` launcher allows to use a web browser from a virtual machine man
 * `password` Password to use inside the virtual machine.
 
 * `closeOnFailedCalibration` If set to true (which is the default), the virtual machine will be closed (powered off and deleted) when the calibration fails. This parameter can be set to false to let the virtual machine continue running when the calibration fails. Note that this parameter requires vbox-robot version 0.0.4 and later (it is ignored with earlier versions).
+
+
+## Variables
+
+Some configuration properties of the launchers, such as command line parameters, can contain variables, as documented in the corresponding properties. The following variables are available in this case:
+
+* `${ATTESTER-URL}` The URL the browser should connect to.
+
+* `${ATTESTER-HOSTNAME}` The host name part of `${ATTESTER-URL}`.
+
+* `${ATTESTER-SLAVEID}` The unique identifier of the current slave, which is also included in `${ATTESTER-URL}` as the `id` parameter.
 
 ## License
 

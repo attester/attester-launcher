@@ -20,6 +20,7 @@ var spawn = require('child_process').spawn;
 var Q = require("q");
 var streamToLog = require("../util/streamToLog");
 var processToPromise = require("../util/processToPromise");
+var buildCommandLine = require("../util/buildCommandLine");
 
 var VirtualBoxLauncher = module.exports = function() {};
 
@@ -59,7 +60,8 @@ VirtualBoxLauncher.prototype.start = function(param) {
         })
         .then(function() {
             self.vboxStartSuccessful = true;
-            var args = ["guestcontrol", self.vboxVM, "run", "--wait-stdout", "--wait-stderr", "--username", config.username, "--password", config.password || "", "--exe", config.command, "--", config.command].concat(config.commandArgs || [], [param.url]);
+            var commandLine = buildCommandLine(config.command, config.commandArgs, "${ATTESTER-URL}", param.variables);
+            var args = ["guestcontrol", self.vboxVM, "run", "--wait-stdout", "--wait-stderr", "--username", config.username, "--password", config.password || "", "--exe", commandLine[0], "--"].concat(commandLine);
             return self.vboxExec(args);
         })
         .finally(function() {

@@ -28,7 +28,7 @@ var MockLauncher = function() {
     this.start = sinon.spy(function(param) {
         expect(self.startCalled).to.be.false;
         self.startCalled = true;
-        self.url = url.parse(param.url, true);
+        self.url = url.parse(param.variables.replace("${ATTESTER-URL}"), true);
         self.config = param.config;
     });
     this.stop = sinon.spy(function() {

@@ -15,6 +15,8 @@
 
 var util = require("util");
 var StateMachine = require("./stateMachine");
+var url = require("url");
+var VariablesSet = require("./util/variablesSet");
 
 var Slave = module.exports = function(server, slaveFactory) {
     this.server = server;
@@ -121,11 +123,15 @@ Slave.prototype.onStateConnecting = function() {
         this.setState("Exited");
         return;
     }
-    var url = this.server.replace(/\/$/, "") + "/__attester__/slave.html?id=" + encodeURIComponent(this.id);
+    var variables = new VariablesSet();
+    variables.values["ATTESTER-SLAVEID"] = this.id;
+    variables.values["ATTESTER-HOSTNAME"] = url.parse(this.server).hostname;
+    var slaveURL = this.server.replace(/\/$/, "") + "/__attester__/slave.html?id=" + encodeURIComponent(this.id);
     var urlExtraParameters = this.slaveFactory.urlExtraParameters;
     if (urlExtraParameters) {
-        url += "&" + urlExtraParameters;
+        slaveURL += "&" + variables.replace(urlExtraParameters);
     }
+    variables.values["ATTESTER-URL"] = slaveURL;
     this.emit("log", ["info", "Starting an instance of %s with %s", this.slaveFactory.browserName, this.slaveFactory.name]);
     try {
         this.launcher = new this.slaveFactory.launcherConstructor();
@@ -133,7 +139,7 @@ Slave.prototype.onStateConnecting = function() {
         this.launcher.once("exit", this.onLauncherExit.bind(this));
         this.launcher.on("disable", this.onDisable.bind(this));
         this.launcher.start({
-            url: url,
+            variables: variables,
             config: this.slaveFactory.launcherConfig
         });
     } catch (e) {
