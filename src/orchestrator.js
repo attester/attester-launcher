@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-var socketIO = require("socket.io-client");
+var WebSocket = require("ws");
 var util = require("util");
+var url = require("url");
 
 var StateMachine = require("./stateMachine");
 var SlaveFactory = require("./slaveFactory");
@@ -41,7 +42,7 @@ Orchestrator.prototype.stateTimeouts = {
 StateMachine.prototype.onStateTimeout = function() {
     if (this.state == "WaitingStatus") {
         this.emit("log", ["error", "Timeout while waiting for the status of the attester server."]);
-        this.socket.disconnect();
+        this.socket.close();
     }
 };
 
@@ -104,30 +105,30 @@ Orchestrator.prototype.onStateConnecting = function() {
     this.slavesWaitingId = [];
 
     this.emit("log", ["info", "Connecting to %s", this.server]);
-    var socket = this.socket = (this.socketIO || socketIO)(this.server, {
-        reconnection: false
+
+    var parsedServerURL = url.parse(this.server);
+    var websocketURL = url.format({
+        protocol: /s:?$/i.test(parsedServerURL.protocol) ? 'wss' : 'ws',
+        slashes: true,
+        host: parsedServerURL.host,
+        pathname: '/sockjs/websocket'
     });
-    socket.on('connect', this.onSocketConnect.bind(this));
-    socket.on('connect_error', this.onSocketConnectError.bind(this));
-    socket.on('status', this.onSocketStatus.bind(this));
-    socket.on('slaveCreated', this.onSocketSlaveCreated.bind(this));
-    socket.on('slaveConnected', this.onSocketSlaveConnected.bind(this));
-    socket.on('slaveBusy', this.onSocketSlaveBusy.bind(this));
-    socket.on('slaveIdle', this.onSocketSlaveIdle.bind(this));
-    socket.on('slaveDisconnected', this.onSocketSlaveDisconnected.bind(this));
-    socket.on('disconnect', this.onSocketDisconnect.bind(this));
+    var WebSocketConstructor = this.WebSocket || WebSocket;
+    var socket = this.socket = new WebSocketConstructor(websocketURL);
+    socket.on('open', this.onSocketConnect.bind(this));
+    socket.on('message', this.onSocketMessage.bind(this));
+    socket.on('close', this.onSocketDisconnect.bind(this));
+    socket.on('error', this.onSocketConnectError.bind(this));
 };
 
 Orchestrator.prototype.stop = function() {
-    this.socket.disconnect();
+    this.socket.close();
 };
 
 Orchestrator.prototype.onSocketConnect = function() {
     this.emit("log", ["info", "Connected to %s", this.server]);
     this.connected = true;
-    this.socket.emit("hello", {
-        "type": "slaveController"
-    });
+    this.socket.send('{"type":"slaveController"}');
     this.askStatus();
 };
 
@@ -136,17 +137,26 @@ Orchestrator.prototype.onSocketConnectError = function(error) {
     this.setState("Disconnected");
 };
 
+Orchestrator.prototype.onSocketMessage = function(message) {
+    var data = JSON.parse(message);
+    var type = data.type;
+    var handler = this['onSocketMessage_' + type];
+    if (handler) {
+        handler.call(this, data);
+    }
+};
+
 Orchestrator.prototype.askStatus = function() {
     if (this.connected && this.state != "WaitingStatus") {
         this.setState("WaitingStatus");
         this.emit("log", ["debug", "Requesting status"]);
-        this.socket.emit("status");
+        this.socket.send('{"type":"status"}');
     }
 };
 
-Orchestrator.prototype.onSocketStatus = function(status) {
+Orchestrator.prototype.onSocketMessage_status = function(data) {
     this.emit("log", ["debug", "Received status"]);
-    this.status = status;
+    this.status = data.status;
     this.checkAndStartSlaves();
 };
 
@@ -216,7 +226,7 @@ Orchestrator.prototype.isAnySlaveRunning = function() {
 
 Orchestrator.prototype.onStateIdle = function() {
     this.emit("log", ["info", "attester-launcher is idle"]);
-    this.socket.disconnect();
+    this.socket.close();
 };
 
 Orchestrator.prototype.computeMaxSlavesToStartForBrowser = function(browser) {
@@ -250,7 +260,7 @@ Orchestrator.prototype.createSlaves = function(slaveFactory, number) {
             slave.once("exit", this.onSlaveExited.bind(this, slave));
             slave.on("log", this.onSlaveLog.bind(this, slave));
             this.slavesWaitingId.push(slave);
-            this.socket.emit("slaveCreate");
+            this.socket.send('{"type":"slaveCreate"}');
         }
     }
 };
@@ -263,11 +273,15 @@ Orchestrator.prototype.updateSlavesCounts = function(slaveFactory, count) {
     });
 };
 
-Orchestrator.prototype.onSocketSlaveCreated = function(slaveId) {
+Orchestrator.prototype.onSocketMessage_slaveCreated = function(data) {
+    var slaveId = data.slaveId;
     this.emit("log", ["debug", "Received slaveCreated %s", slaveId]);
     if (!this.slavesWaitingId.length) {
         this.emit("log", ["debug", "Sending slaveDelete %s", slaveId]);
-        this.socket.emit("slaveDelete", slaveId);
+        this.socket.send(JSON.stringify({
+            type: "slaveDelete",
+            slaveId: slaveId
+        }));
         return;
     }
     var slave = this.slavesWaitingId.shift();
@@ -284,7 +298,10 @@ Orchestrator.prototype.onSlaveExited = function(slave) {
             delete this.slavesById[slaveId];
             if (this.connected) {
                 this.emit("log", ["debug", "Sending slaveDelete %s", slaveId]);
-                this.socket.emit("slaveDelete", slaveId);
+                this.socket.send(JSON.stringify({
+                    type: "slaveDelete",
+                    slaveId: slaveId
+                }));
             }
         }
     } else {
@@ -317,7 +334,7 @@ Orchestrator.prototype.onSlaveLog = function(slave, logArgs) {
 
 var createSocketSlaveHandler = function(methodName, ignoreMissingSlave) {
     return function(arg) {
-        var slaveId = arg.id || arg;
+        var slaveId = arg.slaveId;
         this.emit("log", ["debug", "%s", methodName, slaveId]);
         var slave = this.slavesById[slaveId];
         if (slave) {
@@ -329,10 +346,10 @@ var createSocketSlaveHandler = function(methodName, ignoreMissingSlave) {
     };
 };
 
-Orchestrator.prototype.onSocketSlaveConnected = createSocketSlaveHandler("onSlaveConnected");
-Orchestrator.prototype.onSocketSlaveBusy = createSocketSlaveHandler("onSlaveBusy");
-Orchestrator.prototype.onSocketSlaveIdle = createSocketSlaveHandler("onSlaveIdle");
-Orchestrator.prototype.onSocketSlaveDisconnected = createSocketSlaveHandler("onSlaveDisconnected", true);
+Orchestrator.prototype.onSocketMessage_slaveConnected = createSocketSlaveHandler("onSlaveConnected");
+Orchestrator.prototype.onSocketMessage_slaveBusy = createSocketSlaveHandler("onSlaveBusy");
+Orchestrator.prototype.onSocketMessage_slaveIdle = createSocketSlaveHandler("onSlaveIdle");
+Orchestrator.prototype.onSocketMessage_slaveDisconnected = createSocketSlaveHandler("onSlaveDisconnected", true);
 
 Orchestrator.prototype.onSocketDisconnect = function() {
     this.setState("Disconnected");

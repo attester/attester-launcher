@@ -54,14 +54,14 @@ describe("orchestrator", function() {
         });
         var serverMock = new ServerMock();
         server = serverMock.mockApi;
-        orchestrator.socketIO = sinon.stub();
-        orchestrator.socketIO.returns(serverMock.socketApi);
+        orchestrator.WebSocket = sinon.stub();
+        orchestrator.WebSocket.returns(serverMock.socketApi);
         orchestrator.on('log', logSpy);
         orchestrator.on('log', log);
     });
 
     afterEach(function() {
-        expect(orchestrator.socketIO.calledOnce).to.be.true;
+        expect(orchestrator.WebSocket.calledOnce).to.be.true;
         expect(server.disconnected).to.be.true;
         expect(orchestrator.connected).to.be.false;
         expect(orchestratorExited.inspect().state).to.equal("fulfilled");
@@ -82,9 +82,9 @@ describe("orchestrator", function() {
             server: "http://localhost:7777",
             browsers: {}
         });
-        expect(orchestrator.socketIO.calledOnce).to.be.true;
+        expect(orchestrator.WebSocket.calledOnce).to.be.true;
         clock.tick(10);
-        server.send("connect");
+        server.connect();
         clock.tick(100);
         sinon.assert.alwaysCalledWith(logSpy, infoOrDebugMessage);
     });
@@ -109,9 +109,9 @@ describe("orchestrator", function() {
                 }
             }
         });
-        expect(orchestrator.socketIO.calledOnce).to.be.true;
+        expect(orchestrator.WebSocket.calledOnce).to.be.true;
         clock.tick(10);
-        server.send("connect");
+        server.connect();
         clock.tick(1000);
         expect(server.slaves).to.have.length(1);
         expect(launcherMock.instances).to.have.length(1);
@@ -119,8 +119,9 @@ describe("orchestrator", function() {
         expect(launcherInstance.url.hostname).to.equal("my.special.host.fr");
         expect(launcherInstance.url.port).to.equal("1234");
         expect(launcherInstance.url.query.id).to.equal(server.slaves[0]);
-        server.send("slaveConnected", {
-            id: server.slaves[0],
+        server.send({
+            type: "slaveConnected",
+            slaveId: server.slaves[0],
             displayName: "PhantomJS",
             campaignBrowsers: [{
                 campaign: "12345",
@@ -133,11 +134,17 @@ describe("orchestrator", function() {
         });
         clock.tick(2000);
         server.status.campaigns[0].browsers[0].remainingTasks = 0;
-        server.send("slaveIdle", server.slaves[0]);
+        server.send({
+            type: "slaveIdle",
+            slaveId: server.slaves[0]
+        });
         clock.tick(500);
         expect(launcherInstance.stopCalled).to.be.true;
         clock.tick(10);
-        server.send("slaveDisconnected", server.slaves[0]);
+        server.send({
+            type: "slaveDisconnected",
+            slaveId: server.slaves[0]
+        });
         clock.tick(10);
         launcherInstance.emit("exit");
         clock.tick(100);
