@@ -14,12 +14,12 @@
  */
 
 module.exports = function(map) {
-    var iterator = map.entries();
+    var iterator = map.keys();
     var res = {};
     var next = iterator.next();
     while (!next.done) {
-        var value = next.value;
-        res[value[0]] = value[1];
+        var key = next.value;
+        res[key] = map.get(key);
         next = iterator.next();
     }
     return res;
