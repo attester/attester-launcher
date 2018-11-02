@@ -19,6 +19,8 @@ var util = require("util");
 var events = require("events");
 var mapToJson = require("../util/mapToJson");
 
+webdriver.promise.USE_PROMISE_MANAGER = false;
+
 var WebdriverLauncher = module.exports = function() {};
 
 util.inherits(WebdriverLauncher, events.EventEmitter);
