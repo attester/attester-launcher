@@ -179,7 +179,7 @@ Note that the `puppeteer` package is not declared as a dependency of *attester-l
 
 * `puppeteerOptions` Argument to be used when calling `puppeteer.launch`. See [here](https://github.com/GoogleChrome/puppeteer/blob/v1.17.0/docs/api.md#puppeteerlaunchoptions) for a list of available options.
 
-* `robot` If set to a truthy value, a `phantomJSRobot` object will be exposed in the root `window` of the browser, containing a `sendEvent` method and a `keys` object which allow to send input events (keyboard and mouse) to the web page. This API is compatible with the one provided when using the `$phantomjs` launcher.
+* `robot` If set to a truthy value, a `phantomJSRobot` object will be exposed on the root `window` of the browser, containing a `sendEvent` method and a `keys` object which allow to send input events (keyboard and mouse) to the web page. This API is compatible with the one provided when using the `$phantomjs` launcher.
 
 * `puppeteerKeyboardPath` Path to a file similar to [this one](https://github.com/GoogleChrome/puppeteer/blob/v1.17.0/lib/USKeyboardLayout.js), containing the definition of available keys. This value is passed to the node.js `require` function. Defaults to `puppeteerPath + "/lib/USKeyboardLayout"`. It is only used in order to populate the `phantomJSRobot.keys` object if `robot` is truthy.
 
