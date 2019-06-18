@@ -79,6 +79,7 @@ SlaveFactory.prototype.createSlave = function(server) {
 var builtinLaunchers = SlaveFactory.builtinLaunchers = {
     "$process": require("./launchers/process"),
     "$phantomjs": require("./launchers/phantomjs"),
+    "$puppeteer": require("./launchers/puppeteer"),
     "$webdriver": require("./launchers/webdriver"),
     "$saucelabs": require("./launchers/saucelabs"),
     "$virtualbox": require("./launchers/virtualbox"),
