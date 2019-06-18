@@ -169,6 +169,20 @@ The `$phantomjs` launcher allows to easily start [PhantomJS](http://phantomjs.or
 * `scriptArgs` Arguments to the phantomjs control script. Defaults to an empty array.
     * The `--local-console` argument can be used to display logs (calls to `console.log`, `console.error`...) locally before sending them to the attester server. If this argument is not used, those logs are only sent to the attester server.
 
+### $puppeteer
+
+The `$puppeteer` launcher allows to start a browser with [puppeteer](https://www.npmjs.com/package/puppeteer) or any compatible package (such as [puppeteer-firefox](https://www.npmjs.com/package/puppeteer-firefox)).
+
+Note that the `puppeteer` package is not declared as a dependency of *attester-launcher* and has to be installed separately.
+
+* `puppeteerPath` Path to the puppeteer-compatible package, passed to the node.js `require` function. Defaults to `puppeteer`, which works out of the box if `puppeteer` is installed as a dependency of a package which also depends on *attester-launcher*.
+
+* `puppeteerOptions` Argument to be used when calling `puppeteer.launch`. See [here](https://github.com/GoogleChrome/puppeteer/blob/v1.17.0/docs/api.md#puppeteerlaunchoptions) for a list of available options.
+
+* `robot` If set to a truthy value, a `phantomJSRobot` object will be exposed on the root `window` of the browser, containing a `sendEvent` method and a `keys` object which allow to send input events (keyboard and mouse) to the web page. This API is compatible with the one provided when using the `$phantomjs` launcher.
+
+* `puppeteerKeyboardPath` Path to a file similar to [this one](https://github.com/GoogleChrome/puppeteer/blob/v1.17.0/lib/USKeyboardLayout.js), containing the definition of available keys. This value is passed to the node.js `require` function. Defaults to `puppeteerPath + "/lib/USKeyboardLayout"`. It is only used in order to populate the `phantomJSRobot.keys` object if `robot` is truthy.
+
 ### $webdriver
 
 The `$webdriver` launcher allows to start a browser with [Selenium WebDriver](http://selenium.googlecode.com/git/docs/api/javascript/index.html).
