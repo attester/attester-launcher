@@ -1,6 +1,6 @@
 # attester-launcher
 
-[![Build Status](https://secure.travis-ci.org/attester/attester-launcher.png)](https://travis-ci.org/attester/attester-launcher)
+[![Build Status](https://github.com/attester/attester-launcher/workflows/ci/badge.svg?branch=master&event=push)](https://github.com/attester/attester-launcher/actions?query=branch%3Amaster+event%3Apush)
 [![Dependencies](https://david-dm.org/attester/attester-launcher.svg?style=flat)](https://david-dm.org/attester/attester-launcher)
 [![devDependencies](https://david-dm.org/attester/attester-launcher/dev-status.svg?style=flat)](https://david-dm.org/attester/attester-launcher#info=devDependencies)
 
