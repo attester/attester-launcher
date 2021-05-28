@@ -28,7 +28,7 @@
         "minimist": "1.2.5",
         "q": "1.5.1",
         "selenium-webdriver": "4.0.0-alpha.7",
-        "ws": "7.3.0"
+        "ws": "7.4.5"
     },
     "devDependencies": {
         "chai": "4.2.0",
