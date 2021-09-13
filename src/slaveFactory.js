@@ -80,6 +80,7 @@ var builtinLaunchers = SlaveFactory.builtinLaunchers = {
     "$process": require("./launchers/process"),
     "$phantomjs": require("./launchers/phantomjs"),
     "$puppeteer": require("./launchers/puppeteer"),
+    "$playwright": require("./launchers/playwright"),
     "$webdriver": require("./launchers/webdriver"),
     "$saucelabs": require("./launchers/saucelabs"),
     "$virtualbox": require("./launchers/virtualbox"),

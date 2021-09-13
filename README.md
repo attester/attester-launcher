@@ -183,6 +183,24 @@ Note that the `puppeteer` package is not declared as a dependency of *attester-l
 
 * `puppeteerKeyboardPath` Path to a file similar to [this one](https://github.com/GoogleChrome/puppeteer/blob/v1.17.0/lib/USKeyboardLayout.js), containing the definition of available keys. This value is passed to the node.js `require` function. Defaults to `puppeteerPath + "/lib/USKeyboardLayout"`. It is only used in order to populate the `phantomJSRobot.keys` object if `robot` is truthy.
 
+### $playwright
+
+The `$playwright` launcher allows to start a browser with [playwright](https://www.npmjs.com/package/playwright) or any compatible package (such as [playwright-firefox](https://www.npmjs.com/package/playwright-firefox)).
+
+Note that the `playwright` package is not declared as a dependency of *attester-launcher* and has to be installed separately.
+
+* `playwrightPath` Path to the playwright-compatible package, passed to the node.js `require` function. Defaults to `playwright`, which works out of the box if `playwright` is installed as a dependency of a package which also depends on *attester-launcher*.
+
+* `browser` Name of the browser, such as `chromium` (the default), `firefox` or `webkit`. An object with that name must be exported by the playwright-compatible package and have a `launch` method.
+
+* `launchOptions` Argument to be used when calling `browserType.launch`. See [here](https://playwright.dev/docs/api/class-browsertype#browser-type-launch) for a list of available options.
+
+* `contextOptions` Argument to be used when calling `browser.newPage`. See [here](https://playwright.dev/docs/api/class-browser#browser-new-page) for a list of available options.
+
+* `robot` If set to a truthy value, a `phantomJSRobot` object will be exposed on the root `window` of the browser, containing a `sendEvent` method and a `keys` object which allow to send input events (keyboard and mouse) to the web page. This API is compatible with the one provided when using the `$phantomjs` launcher.
+
+* `playwrightKeyboardPath` Path to a file similar to [this one](https://github.com/microsoft/playwright/blob/v1.14.1/src/server/usKeyboardLayout.ts), containing the definition of available keys. This value is passed to the node.js `require` function. Defaults to `playwrightPath + "/lib/server/usKeyboardLayout.js"`. It is only used in order to populate the `phantomJSRobot.keys` object if `robot` is truthy.
+
 ### $webdriver
 
 The `$webdriver` launcher allows to start a browser with [Selenium WebDriver](http://selenium.googlecode.com/git/docs/api/javascript/index.html).
