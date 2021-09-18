@@ -17,7 +17,8 @@ var webdriver = require('selenium-webdriver');
 var Q = require("q");
 var util = require("util");
 var events = require("events");
-var mapToJson = require("../util/mapToJson");
+var installRobot = require("./robot");
+var mapToJson = require("../../util/mapToJson");
 
 webdriver.promise.USE_PROMISE_MANAGER = false;
 
@@ -63,6 +64,11 @@ WebdriverLauncher.prototype.start = function(param) {
                 self.stopPromise = Q.Promise(function(resolve) {
                     self.stopResolve = resolve;
                 });
+                if (config.robot) {
+                    installRobot(self.driver, self.stopPromise, function(log) {
+                        self.emit("log", log);
+                    });
+                }
                 self.keepConnection();
                 return self.stopPromise;
             }
