@@ -25,7 +25,7 @@
     "dependencies": {
         "colors": "0.6.2",
         "js-yaml": "3.14.0",
-        "minimist": "1.2.5",
+        "minimist": "1.2.6",
         "q": "1.5.1",
         "selenium-webdriver": "4.0.0-alpha.7",
         "ws": "7.3.0"
